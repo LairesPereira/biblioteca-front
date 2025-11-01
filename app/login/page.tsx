@@ -26,6 +26,7 @@ export default function LoginPage() {
             setMessage("Login realizado com sucesso! Redirecionando...");
             setError(null);
             localStorage.setItem("token", res.token);
+            console.log(res.token)
             router.push("/dashboard");
         } catch (err) {
             setError("Erro ao fazer login. Verifique suas credenciais e tente novamente.");

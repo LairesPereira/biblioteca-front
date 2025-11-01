@@ -23,6 +23,7 @@ export default function DashboardPage() {
     const [livros, setLivros] = useState<Livro[]>([]);
     const [foundBooks, setFoundBooks] = useState<Livro[]>([]);
     const [tempBooks, setTempBooks] = useState<Livro[]>([]);
+    const [livroEmprestimo, setLivroEmprestimo] = useState<Livro>();
     const [bookToEdit, setBookToEdit] = useState<Livro>();
     const [emprestimoModalOpen, setEmprestimoModalOpen] = useState(false);
     const [editBookModalOpen, setEditBookModalOpen] = useState(false);
@@ -32,7 +33,8 @@ export default function DashboardPage() {
         setEmprestimoModalOpen(!emprestimoModalOpen);
     }
 
-    function handleEmprestimo() {
+    function handleEmprestimo(bookId: Livro) {
+        setLivroEmprestimo(bookId);
         setEmprestimoModalOpen(!emprestimoModalOpen);
     }
 
@@ -42,6 +44,7 @@ export default function DashboardPage() {
             reFetchBooks();
             return;
         }
+
         const query = event.target.value.toLowerCase();
         findBook.current = query;
         
@@ -50,6 +53,7 @@ export default function DashboardPage() {
             livro.autor.toLowerCase().includes(query) ||
             livro.isbn.toLowerCase().includes(query)
         );
+
         setLivros(foundBooks);
     }
 
@@ -65,6 +69,7 @@ export default function DashboardPage() {
             router.push("/login");
             return;
         }
+        
         const loadBooks = async () => {
             try {
                 const res = await fetchBooks(token);
@@ -144,6 +149,7 @@ export default function DashboardPage() {
                         <ModalEmprestimo 
                             emprestimoModalOpen={emprestimoModalOpen} 
                             toggleEmprestimoModal={toggleEmprestimoModal}
+                            livro={livroEmprestimo}
                          />
                     }
 
@@ -180,7 +186,7 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="mt-4 space-x-4 text-right">
-                                <button onClick={handleEmprestimo} className="px-4 py-2 rounded-lg bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-all">
+                                <button onClick={() => handleEmprestimo(livro)} className="px-4 py-2 rounded-lg bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-all">
                                     Emprestar
                                 </button>
                                 <button onClick={() => handleEditBook(livro)} className="px-4 py-2 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-indigo-600 transition-all">

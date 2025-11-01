@@ -33,11 +33,14 @@ export default function Header() {
         {/* Botão */}
         <div className="hidden md:block">
         <nav className="space-x-6 hidden md:flex">
-          <Button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          <Button onClick={() => router.push("/dashboard")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             Buscar Livros
           </Button>
-          <Button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Empréstimos
+          <Button onClick={() => router.push("/usuarios")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Usuários
+          </Button>
+          <Button onClick={() => router.push("/emprestimos")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
+            Emprestimos 
           </Button>
           <Button onClick={() => router.push("register-book")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
             Cadastrar Livro

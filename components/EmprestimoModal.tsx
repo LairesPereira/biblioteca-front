@@ -1,11 +1,59 @@
+import { Input } from "./ui/input";
+import { registrarEmprestimo } from "@/lib/api";
+import { useRouter } from "next/navigation";
+
+export interface Livro {
+    id: string;
+    titulo: string;
+    autor: string;
+    isbn: string;
+    quantidadeTotal: number;
+    quantidadeDisponivel: number;
+}
+
 export interface ModalEmprestimoProps {
     emprestimoModalOpen: boolean;
     toggleEmprestimoModal: () => void;
+    livro?: Livro;
+    
 }
 
 export default function ModalEmprestimo(ModalEmprestimoProps: ModalEmprestimoProps) {
+    const router = useRouter();
     if (!ModalEmprestimoProps.emprestimoModalOpen) {
         return null;
+    }
+
+    const handleEmprestimoSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.currentTarget);
+        const token = localStorage.getItem("token") 
+        if (!token) {
+            router.push("/login");
+            return;
+        }
+        const emprestarLivro = async () => {
+            try {
+              const res = await registrarEmprestimo({
+                livroId: ModalEmprestimoProps.livro?.id,
+                cpf: formData.get("aluno") as string,
+              }, token);
+              if (!res.ok) {
+                throw new Error("Erro ao registrar empréstimo");
+              } else {
+                console.log("Empréstimo registrado com sucesso");
+              }
+            } catch (error) {
+              throw new Error("Erro ao registrar empréstimo: " + error);
+            }
+        }
+
+        await emprestarLivro();
+
+        console.log("Emprestimo confirmado para o aluno com CPF:", formData.get("aluno"));
+        console.log("Livro emprestado:", ModalEmprestimoProps.livro);
+        ModalEmprestimoProps.toggleEmprestimoModal();
     }
 
     return (
@@ -20,7 +68,7 @@ export default function ModalEmprestimo(ModalEmprestimoProps: ModalEmprestimoPro
           <span className="font-semibold">A Revolução dos Bichos</span>
         </p>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleEmprestimoSubmit}>
           <div>
             <label
               htmlFor="aluno"
@@ -28,27 +76,15 @@ export default function ModalEmprestimo(ModalEmprestimoProps: ModalEmprestimoPro
             >
               CPF do Aluno
             </label>
-            <input
+            <Input 
               id="aluno"
+              name="aluno"
               type="text"
-              placeholder="Digite o nome do aluno"
+              placeholder="Digite o CPF do aluno"
               className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
             />
           </div>
-
-          {/* <div>
-            <label
-              htmlFor="dataDevolucao"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Data de Devolução
-            </label>
-            <input
-              id="dataDevolucao"
-              type="date"
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div> */}
 
           <div className="flex justify-between mt-6">
             <button
@@ -61,7 +97,7 @@ export default function ModalEmprestimo(ModalEmprestimoProps: ModalEmprestimoPro
 
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
+              className=" px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
             >
               Confirmar
             </button>

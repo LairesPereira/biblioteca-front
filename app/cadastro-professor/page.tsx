@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerUser } from "@/lib/api";
 import Image from "next/image";
-import { cp } from "fs";
 
 export default function Home() {
   const router = useRouter();
@@ -28,6 +27,7 @@ export default function Home() {
       role: "ROLE_ESTUDANTE",
       cpf: formData.get("cpf")
     }
+    console.log(data);
     registerUser(data)
       .then(() => {
         setMessage("Cadastro realizado com sucesso! Redirecionando para o login...");
@@ -97,17 +97,6 @@ export default function Home() {
                 name="email"
                 type="email"
                 placeholder="Seu email institucional"
-                required
-                className="text-base py-3"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label className="text-lg font-medium text-gray-700">CPF</Label>
-              <Input
-                name="cpf"
-                type="text"
-                placeholder="Crie uma senha segura"
                 required
                 className="text-base py-3"
               />
