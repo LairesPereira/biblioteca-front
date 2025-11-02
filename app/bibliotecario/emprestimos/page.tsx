@@ -10,7 +10,21 @@ import Header from "@/components/Header";
 export default function ListaEmprestimosPage() {
   const router = useRouter();
   const [emprestimos, setEmprestimos] = useState<ListaEmprestimosProps[]>([]);
-  
+
+  // Função para formatar as datas recebidas
+  const formatarData = (valor: string | number | null | undefined) => {
+    if (!valor) return "-";
+    const data = new Date(valor);
+    if (isNaN(data.getTime())) return "-";
+
+    return data.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,10 +34,22 @@ export default function ListaEmprestimosPage() {
     }
 
     const loadEmprestimos = async () => {
-      const response = await fetchEmprestimos(token);
-      const data = await response.json();
-      console.log(data);
-      setEmprestimos(data);
+      try {
+        const response = await fetchEmprestimos(token);
+        const data = await response.json();
+
+        const emprestimosConvertidos = data.map((emp: ListaEmprestimosProps) => ({
+          ...emp,
+          inicio: formatarData(emp.inicio),
+          previsaoDevolucao: formatarData(emp.previsaoDevolucao),
+          devolucao: emp.devolucao ? formatarData(emp.devolucao) : "-",
+          rawPrevisao: emp.previsaoDevolucao, 
+        }));
+
+        setEmprestimos(emprestimosConvertidos);
+      } catch (error) {
+        console.error("Erro ao carregar empréstimos:", error);
+      }
     };
 
     loadEmprestimos();
@@ -37,23 +63,22 @@ export default function ListaEmprestimosPage() {
     }
 
     const devolverEmprestimo = async () => {
-       const res = await devolverLivro(emp.usuario.cpf, emp.id, emp.livro.id, token);
-        if (res.ok) {
-          router.refresh();
-        } else {
-          alert("Erro ao devolver o livro.");
-        }
+      const res = await devolverLivro(emp.usuario.cpf, emp.id, emp.livro.id, token);
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Erro ao devolver o livro.");
+      }
     };
     devolverEmprestimo();
-  }
+  };
 
   return (
     <>
       <div className="mb-24">
-        <Header 
-          userType="admin"
-        />
+        <Header userType="admin" />
       </div>
+
       <div className="p-8 bg-gray-50 min-h-screen">
         <div className="max-w-6xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
           <div className="flex justify-between items-center mb-8">
@@ -77,66 +102,67 @@ export default function ListaEmprestimosPage() {
                   <th className="px-5 py-3 font-medium tracking-wide text-center">Ações</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-200">
-  {emprestimos.map((emp) => {
-    const isDevolvido = emp.statusEmprestimo === "DEVOLVIDO";
-    const isAtrasado =
-      !isDevolvido && new Date(emp.previsaoDevolucao) > new Date();
+                {emprestimos.map((emp) => {
+                  const isDevolvido = emp.statusEmprestimo === "DEVOLVIDO";
+                  const isAtrasado =
+                    !isDevolvido && new Date(emp.rawPrevisao) < new Date();
 
-    return (
-      <tr
-        key={emp.id}
-        className={`hover:bg-gray-50 transition-colors duration-150 ${
-          isAtrasado ? "bg-red-50" : ""
-        }`}
-      >
-        <td className="px-5 py-4 text-gray-700 font-medium">
-          {emp.usuario.nome}
-        </td>
-        <td className="px-5 py-4 text-gray-600">{emp.usuario.cpf}</td>
-        <td className="px-5 py-4 text-gray-700">{emp.livro.titulo}</td>
-        <td className="px-5 py-4 text-gray-600">{emp.livro.autor}</td>
-        <td className="px-5 py-4 text-gray-600">{emp.inicio}</td>
+                  return (
+                    <tr
+                      key={emp.id}
+                      className={`hover:bg-gray-50 transition-colors duration-150 ${
+                        isAtrasado ? "bg-red-50" : ""
+                      }`}
+                    >
+                      <td className="px-5 py-4 text-gray-700 font-medium">
+                        {emp.usuario.nome}
+                      </td>
+                      <td className="px-5 py-4 text-gray-600">{emp.usuario.cpf}</td>
+                      <td className="px-5 py-4 text-gray-700">{emp.livro.titulo}</td>
+                      <td className="px-5 py-4 text-gray-600">{emp.livro.autor}</td>
+                      <td className="px-5 py-4 text-gray-600">{emp.inicio}</td>
 
-        {/* 🔴 Data prevista com destaque se atrasada */}
-        <td
-          className={`px-5 py-4 font-semibold ${
-            isAtrasado ? "text-red-600" : "text-gray-600"
-          }`}
-        >
-          {emp.previsaoDevolucao}
-        </td>
+                      <td
+                        className={`px-5 py-4 font-semibold ${
+                          isAtrasado ? "text-red-600" : "text-gray-600"
+                        }`}
+                      >
+                        {emp.previsaoDevolucao}
+                      </td>
 
-        <td className="px-5 py-4 text-gray-600">{emp.devolucao}</td>
-        <td
-          className={`px-5 py-4 text-center font-semibold ${
-            isDevolvido
-              ? "text-green-600"
-              : isAtrasado
-              ? "text-red-600"
-              : "text-yellow-600"
-          }`}
-        >
-          {emp.statusEmprestimo}
-        </td>
-        <td className="px-5 py-4 text-center">
-          <Button
-            disabled={isDevolvido}
-            onClick={() => handleDevolver(emp)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm ${
-              isDevolvido
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md"
-            }`}
-          >
-            Devolver
-          </Button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+                      <td className="px-5 py-4 text-gray-600">{emp.devolucao}</td>
 
+                      <td
+                        className={`px-5 py-4 text-center font-semibold ${
+                          isDevolvido
+                            ? "text-green-600"
+                            : isAtrasado
+                            ? "text-red-600"
+                            : "text-yellow-600"
+                        }`}
+                      >
+                        {emp.statusEmprestimo}
+                      </td>
+
+                      <td className="px-5 py-4 text-center">
+                        <Button
+                          disabled={isDevolvido}
+                          onClick={() => handleDevolver(emp)}
+                          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm ${
+                            isDevolvido
+                              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                              : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md"
+                          }`}
+                        >
+                          Devolver
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </div>
         </div>

@@ -23,4 +23,5 @@ export interface ListaEmprestimosProps {
     finalizdo: boolean;
     devolucao?: string;
     statusEmprestimo: string;
+    rawPrevisao: string
 }

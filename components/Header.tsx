@@ -53,9 +53,14 @@ export default function Header({ userType }: HeaderProps) {
               Emprestimos 
             </Button>
            ) : (
+            <>
+            <Button onClick={() => router.push("/usuario/dashboard")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Buscar Livros
+            </Button>
             <Button onClick={() => router.push("/usuario/emprestimos")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
               Emprestimos 
             </Button>
+            </>
            ) }
           
           <Button onClick={handleLogut} className=" py-4 py-2 rounded hover:bg-red-500">

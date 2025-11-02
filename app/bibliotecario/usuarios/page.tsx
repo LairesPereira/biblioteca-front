@@ -16,6 +16,7 @@ interface Usuario {
 
 export default function UsuariosPage() {
     const [usuarios, setUsuarios] = useState<Usuario[]>([])
+    const [error, setError] = useState("")
     
     const router = useRouter();
 
@@ -29,6 +30,10 @@ export default function UsuariosPage() {
 
         try {
             const res = await deleteUser(user.cpf, token)
+            if (!res.ok) {
+                const data = await res.json()
+                alert("Nao é possível deletar usuários com empréstimos em aberto!")
+            }
             if (res) {
                 const data = await res.json()
                 console.log(data)

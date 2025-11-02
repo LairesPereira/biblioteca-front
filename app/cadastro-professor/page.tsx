@@ -101,6 +101,17 @@ export default function Home() {
                 className="text-base py-3"
               />
             </div>
+            
+            <div className="space-y-3">
+              <Label className="text-lg font-medium text-gray-700">CPF</Label>
+              <Input
+                name="cpf"
+                type="text"
+                placeholder="Insira seu cpf"
+                required
+                className="text-base py-3"
+              />
+            </div>
 
             <div className="space-y-3">
               <Label className="text-lg font-medium text-gray-700">Senha</Label>

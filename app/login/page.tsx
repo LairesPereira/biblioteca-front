@@ -23,11 +23,20 @@ export default function Login() {
         };
         try {
             const res = await login(data);
+            
+            type Role = "ROLE_ESTUDANTE" | "ROLE_BIBLIOTECARIO" | "ROLE_PROFESSOR";
+            const rotas: Record<Role, string> = {
+                ROLE_ESTUDANTE: "/usuario/dashboard",
+                ROLE_BIBLIOTECARIO: "/bibliotecario/dashboard",
+                ROLE_PROFESSOR: "/bibliotecario/dashboard",
+            };
+
             setMessage("Login realizado com sucesso! Redirecionando...");
             setError(null);
             localStorage.setItem("token", res.token);
-            console.log(res.token)
-            router.push("/usuario/dashboard");
+            
+            const role = res.role as Role;
+            router.push(rotas[role] || "/login");
         } catch (err) {
             setError("Erro ao fazer login. Verifique suas credenciais e tente novamente.");
             setMessage(null);
