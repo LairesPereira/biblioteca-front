@@ -8,7 +8,6 @@ import { fetchBooks, deleteBook } from "@/lib/api";
 import ModalEmprestimo from "@/components/EmprestimoModal";
 import EditBookModal from "@/components/EditBookModal";
 
-
 export interface Livro {
     id: string;
     titulo: string;
@@ -22,7 +21,6 @@ export default function DashboardPage() {
     const router = useRouter();
     const [livros, setLivros] = useState<Livro[]>([]);
     const [foundBooks, setFoundBooks] = useState<Livro[]>([]);
-    const [tempBooks, setTempBooks] = useState<Livro[]>([]);
     const [livroEmprestimo, setLivroEmprestimo] = useState<Livro>();
     const [bookToEdit, setBookToEdit] = useState<Livro>();
     const [emprestimoModalOpen, setEmprestimoModalOpen] = useState(false);
@@ -66,7 +64,7 @@ export default function DashboardPage() {
     function reFetchBooks() {
         const token = localStorage.getItem("token");
         if (!token) {
-            router.push("/login");
+            router.push("/login-bibliotecario");
             return;
         }
         
@@ -87,7 +85,7 @@ export default function DashboardPage() {
     function handleRemoveBook(id: string) {
         const token = localStorage.getItem("token");
         if (!token) {
-            router.push("/login");
+            router.push("/login-bibliotecario");
             return;
         }
         const deletedBook = async () => {
@@ -110,7 +108,7 @@ export default function DashboardPage() {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) {
-            router.push("/login");
+            router.push("/login-bibliotecario");
             return;
         }
 
@@ -132,7 +130,9 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-white">
-            <Header />
+            <Header 
+                userType="admin"
+            />
             <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 p-6">
                 <div className="w-full max-w-4xl">
                     <h2 className="text-3xl font-bold mb-10 mt-30 text-center text-indigo-700 drop-shadow-sm">
@@ -185,17 +185,29 @@ export default function DashboardPage() {
                                 <p className="text-gray-500 text-sm">Disponíveis: {livro.quantidadeDisponivel}</p>
                             </div>
 
-                            <div className="mt-4 space-x-4 text-right">
-                                <button onClick={() => handleEmprestimo(livro)} className="px-4 py-2 rounded-lg bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-all">
+                            <div className="mt-6 flex flex-wrap justify-center gap-3">
+                                <button
+                                    onClick={() => handleEmprestimo(livro)}
+                                    className="px-4 py-2 min-w-[100px] rounded-lg bg-indigo-600 text-white text-sm font-semibold shadow hover:bg-indigo-700 hover:shadow-md transition-all duration-200"
+                                >
                                     Emprestar
                                 </button>
-                                <button onClick={() => handleEditBook(livro)} className="px-4 py-2 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-indigo-600 transition-all">
+
+                                <button
+                                    onClick={() => handleEditBook(livro)}
+                                    className="px-4 py-2 min-w-[100px] rounded-lg bg-purple-600 text-white text-sm font-semibold shadow hover:bg-purple-700 hover:shadow-md transition-all duration-200"
+                                >
                                     Editar
                                 </button>
-                                <button onClick={() => handleRemoveBook(livro.id)} className="px-4 py-2 rounded-lg bg-red-300 text-white text-sm font-medium hover:bg-red-600 transition-all">
+
+                                <button
+                                    onClick={() => handleRemoveBook(livro.id)}
+                                    className="px-4 py-2 min-w-[100px] rounded-lg bg-red-500 text-white text-sm font-semibold shadow hover:bg-red-600 hover:shadow-md transition-all duration-200"
+                                >
                                     Remover
                                 </button>
-                            </div>
+                                </div>
+
                             </div>
                         </li>
                         ))}

@@ -1,17 +1,19 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
 
-export default function Header() {
+interface HeaderProps {
+    userType: string
+}
 
+export default function Header({ userType }: HeaderProps) {
   const router = useRouter();
 
   const handleLogut = () => {
     localStorage.removeItem('token');
-    router.push('/login');
+    router.push('/login-bibliotecario');
   }
 
   return (
@@ -33,18 +35,29 @@ export default function Header() {
         {/* Botão */}
         <div className="hidden md:block">
         <nav className="space-x-6 hidden md:flex">
-          <Button onClick={() => router.push("/dashboard")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Buscar Livros
-          </Button>
-          <Button onClick={() => router.push("/usuarios")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Usuários
-          </Button>
-          <Button onClick={() => router.push("/emprestimos")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
-            Emprestimos 
-          </Button>
-          <Button onClick={() => router.push("register-book")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
-            Cadastrar Livro
-          </Button>
+          { userType === "admin" && (
+              <>
+                <Button onClick={() => router.push("/bibliotecario/dashboard")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Buscar Livros
+                </Button>
+                <Button onClick={() => router.push("/bibliotecario/usuarios")} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Usuários
+                </Button>
+                <Button onClick={() => router.push("/bibliotecario/register-book")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
+                  Cadastrar Livro
+                </Button>
+              </>
+           )}
+           { userType === "admin" ? (
+            <Button onClick={() => router.push("/bibliotecario/emprestimos")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
+              Emprestimos 
+            </Button>
+           ) : (
+            <Button onClick={() => router.push("/usuario/emprestimos")} className="bg-blue-600 text-white py-4 py-2 rounded hover:bg-blue-700">
+              Emprestimos 
+            </Button>
+           ) }
+          
           <Button onClick={handleLogut} className=" py-4 py-2 rounded hover:bg-red-500">
             Sair
           </Button>

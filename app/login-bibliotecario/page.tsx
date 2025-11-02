@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/api";
+import { loginUser } from "@/lib/api";
 import Image from "next/image";
 
-export default function Login() {
+export default function LoginPage() {
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -22,12 +22,12 @@ export default function Login() {
           password: formData.get("password")
         };
         try {
-            const res = await login(data);
+            const res = await loginUser(data);
             setMessage("Login realizado com sucesso! Redirecionando...");
             setError(null);
             localStorage.setItem("token", res.token);
             console.log(res.token)
-            router.push("/usuario/dashboard");
+            router.push("/bibliotecario/dashboard");
         } catch (err) {
             setError("Erro ao fazer login. Verifique suas credenciais e tente novamente.");
             setMessage(null);
